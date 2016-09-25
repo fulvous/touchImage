@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#### VARIABLES
+
+TARS="tars"
+
+#### FUNCTIONS
+
 function echoGreen {
 	echo -e "\e[32m$1\e[0m"
 }
@@ -11,6 +17,8 @@ function echoRed {
 function echoStep {
 	echo -ne "\e[1m$1\e[0m"
 }
+
+#### DOWNLOADING
 
 echoStep "Detecting linux-sunxi kernel..."
 if [ ! -d "linux-sunxi" ] ; then
@@ -27,4 +35,31 @@ if [ ! -d "sunxi-bsp" ] ; then
 else
 	echoGreen "Found!"
 fi
+
+echoStep "Detecting rtl8192eu module..."
+if [ ! -d "rtl8192eu" ] ; then
+	echoRed "Not found, downloading!"
+	git clone https://github.com/romcyncynatus/rtl8192eu.git
+else
+	echoGreen "Found!"
+fi
+
+echoStep "Detecting tar directory..."
+if [ ! -d "$TARS" ] ; then
+	echoRed "Not found, creating!"
+	mkdir $TARS
+else
+	echoGreen "Found!"
+fi
+
+echoStep "Detecting Linaro SDK..."
+if [ ! -f "$TARS/linaro-quantal-alip-20130422-342.tar.gz" ] ; then
+	echoRed "Not found, downloading!"
+	cd $TARS
+	wget "http://creadoresdigitales.com/archivos/linaro-quantal-alip-20130422-342.tar.gz"
+	cd ..
+else
+	echoGreen "Found!"
+fi
+
 
