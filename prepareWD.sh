@@ -70,14 +70,43 @@ else
 	echoGreen "Found!"
 fi
 
+echoStep "Detecting uncompressed Linaro SDK..."
+if [ ! -d "binary" ] ; then
+	echoRed "Not found, extracting!"
+	tar zxvf $TARS/linaro-quantal-alip-20130422-342.tar.gz
+else
+	echoGreen "Found!"
+fi
+
+
+#### PREPARING
+
+echoStep "Installing dependencies..."
+sudo apt-get install libusb-1.0
+echoGreen "Done!"
+
+
 #### INSTALLING
 
 echoStep "Installing cubiescreen on kernel sources..."
 #### Copying all sources
-cp cubiescreen/driver/touchscreen/* linux-sunxi/drivers/input/touchscreen/
-cp cubiescreen/driver/video/disp/* linux-sunxi/drivers/video/sunxi/disp/
-cp cubiescreen/driver/video/lcd/* linux-sunxi/drivers/video/sunxi/lcd/
-cp cubiescreen/driver/ctp.h linux-sunxi/include/linux/
+cp -v cubiescreen/driver/touchscreen/* linux-sunxi/drivers/input/touchscreen/
+cp -v cubiescreen/driver/video/disp/* linux-sunxi/drivers/video/sunxi/disp/
+cp -v cubiescreen/driver/video/lcd/* linux-sunxi/drivers/video/sunxi/lcd/
+cp -v cubiescreen/driver/ctp.h linux-sunxi/include/linux/
+echoGreen "Done!"
+
+#### CONFIGURING
+
+echoStep "Configuring sunxi-bsp ..."
+#### Running configure script
+cd sunxi-bsp
+./configure
+cd ..
+echoGreen "Done!"
+
+echoStep "Copying default cubieboard.fex..."
+cp -vf cubiescreen/cubieboard.fex sunxi-bsp/sunxi-boards/sys_config/a10/
 echoGreen "Done!"
 
 
