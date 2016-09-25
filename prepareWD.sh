@@ -1,18 +1,30 @@
 #!/bin/bash
 
-echo -n "Detecting linux-sunxi kernel..."
+function echoGreen {
+	echo -e "\e[32m$1\e[0m"
+}
+
+function echoRed {
+	echo -e "\e[91m$1\e[0m"
+}
+
+function echoStep {
+	echo -ne "\e[1m$1\e[0m"
+}
+
+echoStep "Detecting linux-sunxi kernel..."
 if [ ! -d "linux-sunxi" ] ; then
-	echo "Not found, downloading!"
+	echoRed "Not found, downloading!"
 	git clone https://github.com/linux-sunxi/linux-sunxi.git
 else 
-	echo "Found!"
+	echoGreen "Found!"
 fi
 
-echo -n "Detecting sunxi-bsp tools..."
+echoStep "Detecting sunxi-bsp tools..."
 if [ ! -d "sunxi-bsp" ] ; then
-	echo "Not found, downloading!"
+	echoRed "Not found, downloading!"
 	git clone https://github.com/linux-sunxi/sunxi-bsp.git
 else
-	echo "Found!"
+	echoGreen "Found!"
 fi
 
