@@ -70,4 +70,14 @@ else
 	echoGreen "Found!"
 fi
 
+#### INSTALLING
+
+echoStep "Installing cubiescreen on kernel sources..."
+#### Copying all sources
+cp cubiescreen/driver/touchscreen/* linux-sunxi/drivers/input/touchscreen/
+cp cubiescreen/driver/video/disp/* linux-sunxi/drivers/video/sunxi/disp/
+cp cubiescreen/driver/video/lcd/* linux-sunxi/drivers/video/sunxi/lcd/
+cp cubiescreen/driver/ctp.h linux-sunxi/include/linux/
+echoGreen "Done!"
+
 
