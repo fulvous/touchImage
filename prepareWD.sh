@@ -62,4 +62,12 @@ else
 	echoGreen "Found!"
 fi
 
+echoStep "Detecting uncompressed cubiescreen module..."
+if [ ! -d "cubiescreen" ] ; then
+	echoRed "Not found, extracting!"
+	tar xvf $TARS/cubiescreen_drv.tar
+else
+	echoGreen "Found!"
+fi
+
 
