@@ -34,6 +34,22 @@ function echoStep {
 #### PROCESS
 
 echoStep "Building image..."
-dd if=/dev/zero of=$IMG count=$SECTORS bs=$CHUNK
+#dd if=/dev/zero of=$IMG count=$SECTORS bs=$CHUNK
+echo "img file created with zeros"
+LOOP=$( sudo losetup -f )
+echo "Loop device available: $LOOP"
+sudo losetup $LOOP $IMG
+
+if [ -f "sunxi-bsp/output/cubieboard_hwpack.tar.xz" ] && [ -f "$TARS/ubuntu_sdk.tar.gz" ] ; then
+	sudo sunxi-bsp/scripts/sunxi-media-create.sh $LOOP sunxi-bsp/output/cubieboard_hwpack.tar.xz $TARS/ubuntu_sdk.tar.gz 
+else
+	echoRed "Files not found!"
+	echo "sunxi-bsp/output/cubieboard_hwpack.tar.xz and $TARS/ubuntu_sdk.tar.gz"
+fi
+
+echo "Erasing loop"
+sudo losetup -d $LOOP
+
+
 echoGreen "Done!"
 
