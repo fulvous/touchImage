@@ -73,7 +73,7 @@ fi
 #### PREPARING
 
 echoStep "Installing dependencies..."
-sudo apt-get install libusb-1.0 pkg-config -y
+sudo apt-get install libusb-1.0 pkg-config p7zip-full -y
 echoGreen "Done!"
 
 
@@ -96,14 +96,34 @@ cd sunxi-bsp
 cd ..
 echoGreen "Done!"
 
-echoStep "Copying default cubieboard.fex..."
-cp -vf cubiescreen/cubieboard.fex sunxi-bsp/sunxi-boards/sys_config/a10/
-echoGreen "Done!"
+#echoStep "Copying default cubieboard.fex..."
+#cp -vf cubiescreen/cubieboard.fex sunxi-bsp/sunxi-boards/sys_config/a10/
+#echoGreen "Done!"
 
 #echoStep "Copying sun7i_defconfig..."
 #cp -vf cubiescreen/sun7i_defconfig linux-sunxi/arch/arm/configs/
 #echoGreen "Done!"
 
+echoStep "Detecting Cubian Desktop image..."
+if [ ! -f "$TARS/Cubian-desktop-x1-a10-hdmi.img.7z" ] ; then
+	echoRed "Not found, downloading!"
+	cd $TARS
+	wget "http://creadoresdigitales.com/archivos/Cubian-desktop-x1-a10-hdmi.img.7z"
+	cd ..
+else
+	echoGreen "Found!"
+fi
+
+echoStep "Detecting Cubian Desktop image..."
+if [ ! -f "$TARS/Cubian-desktop-x1-a10-hdmi.img" ] ; then
+	echoRed "Not found, extracting!"
+	cd $TARS
+	7z x Cubian-desktop-x1-a10-hdmi.img.7z
+	cd ..
+else
+	echoGreen "Found!"
+fi
+	
 #if [ ! -f "$TARS/ubuntu_sdk.tar.gz" ] ; then
 #	### Gor for Linaro
 #	echoStep "Detecting Linaro SDK..."
