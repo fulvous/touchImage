@@ -6,3 +6,5 @@ tars/ubuntu_sdk.tar.gz
 cubiescreen
 binary
 *.img
+boot
+system
