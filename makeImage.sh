@@ -34,7 +34,7 @@ function echoStep {
 #### PROCESS
 
 echoStep "Building image..."
-#dd if=/dev/zero of=$IMG count=$SECTORS bs=$CHUNK
+dd if=/dev/zero of=$IMG count=$SECTORS bs=$CHUNK
 echo "img file created with zeros"
 LOOP=$( sudo losetup -f )
 echo "Loop device available: $LOOP"

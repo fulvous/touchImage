@@ -66,7 +66,7 @@ fi
 #### PREPARING
 
 echoStep "Installing dependencies..."
-sudo apt-get install libusb-1.0
+sudo apt-get install libusb-1.0 libusb-1.0-dev
 echoGreen "Done!"
 
 
