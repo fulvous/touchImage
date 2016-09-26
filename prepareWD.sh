@@ -145,8 +145,4 @@ else
 fi
 
 
-echoStep "Building image..."
-cd sunxi-bsp
-./configure cubieboard
-make
-echoGreen "Done!"
+
