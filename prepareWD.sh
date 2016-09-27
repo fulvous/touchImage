@@ -195,6 +195,14 @@ else
 		echoRed "Skiping!"
 	fi
 
+	echoStep "Copying configs..."
+	cp -v cubiescreen/sdk_configure/10-evdev.conf system/usr/share/X11/xorg.conf.d/
+	cp -v cubiescreen/sdk_configure/exynos.conf system/usr/share/X11/xorg.conf.d/
+	cp -v cubiescreen/sdk_configure/xinput_calibrator system/usr/bin
+
+	cp -v cubiescreen/sdk_configure/xinput_calibrator.1.gz system/usr/share/man/man1/
+	cp -v uEnv.txt boot/
+
 	echoStep "Unmounting directories..."
 	sudo umount boot
 	sudo umount system
