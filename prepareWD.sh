@@ -211,6 +211,8 @@ else
 	echoStep "Remooving loop: $LOOP..."
 	sudo losetup -d $LOOP
 	echoGreen "Done!"
+
+	mv $IMG Cubian-A10-touchImage-lcd.img
 fi
 
 
