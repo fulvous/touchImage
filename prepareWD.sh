@@ -212,7 +212,7 @@ else
 	sudo losetup -d $LOOP
 	echoGreen "Done!"
 
-	mv $IMG Cubian-A10-touchImage-lcd.img
+	mv $TARS/$IMG $TARS/Cubian-A10-touchImage-lcd.img
 fi
 
 
