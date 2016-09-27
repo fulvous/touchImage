@@ -40,13 +40,13 @@ else
 	echoGreen "Found!"
 fi
 
-#echoStep "Detecting rtl8192eu module..."
-#if [ ! -d "rtl8192eu" ] ; then
-#	echoRed "Not found, downloading!"
-#	git clone https://github.com/romcyncynatus/rtl8192eu.git
-#else
-#	echoGreen "Found!"
-#fi
+echoStep "Detecting rtl8192eu module..."
+if [ ! -d "rtl8192eu" ] ; then
+	echoRed "Not found, downloading!"
+	git clone https://github.com/romcyncynatus/rtl8192eu.git
+else
+	echoGreen "Found!"
+fi
 
 echoStep "Detecting tar directory..."
 if [ ! -d "$TARS" ] ; then
