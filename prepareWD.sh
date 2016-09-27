@@ -48,6 +48,9 @@ else
 	echoGreen "Found!"
 fi
 
+cp -v rtl8192eu_configs/autoconf.h rtl8192eu/include/
+cp -v rtl8192eu_configs/Makefile rtl8192eu/
+
 echoStep "Detecting tar directory..."
 if [ ! -d "$TARS" ] ; then
 	echoRed "Not found, creating!"
@@ -164,6 +167,11 @@ else
 
 	echo "copying config"
 	cp -v cubian.config linux-sunxi/.config
+
+	echo "copying rtl8192eu"
+	cp -Rf rtl8192eu linux-sunxi/drivers/net/wireless/
+	cp -v rtl8192eu_configs/Kconfig linux-sunxi/drivers/net/wireless/
+	cp -v rtl8192eu_configs/kernel_Makefile linux-sunxi/drivers/net/wireless/Makefile
 	
 	echoStep "compiling..."
 	cd linux-sunxi
@@ -196,12 +204,12 @@ else
 	fi
 
 	echoStep "Copying configs..."
-	cp -v cubiescreen/sdk_configure/10-evdev.conf system/usr/share/X11/xorg.conf.d/
-	cp -v cubiescreen/sdk_configure/exynos.conf system/usr/share/X11/xorg.conf.d/
-	cp -v cubiescreen/sdk_configure/xinput_calibrator system/usr/bin
+	sudo cp -v cubiescreen/sdk_configure/10-evdev.conf system/usr/share/X11/xorg.conf.d/
+	sudo cp -v cubiescreen/sdk_configure/exynos.conf system/usr/share/X11/xorg.conf.d/
+	sudo cp -v cubiescreen/sdk_configure/xinput_calibrator system/usr/bin
 
-	cp -v cubiescreen/sdk_configure/xinput_calibrator.1.gz system/usr/share/man/man1/
-	cp -v uEnv.txt boot/
+	sudo cp -v cubiescreen/sdk_configure/xinput_calibrator.1.gz system/usr/share/man/man1/
+	sudo cp -v uEnv.txt boot/
 
 	echoStep "Unmounting directories..."
 	sudo umount boot
