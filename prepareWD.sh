@@ -3,6 +3,10 @@
 #### VARIABLES
 
 TARS="tars"
+GROW_SIZE_M=275
+THRESHOLD_M=2000
+CUBIAN_IMG="Cubian-desktop-x1-a10-hdmi.img"
+NEW_CUBIAN_PART="cubian_new_part_table"
 
 #### FUNCTIONS
 
@@ -60,20 +64,11 @@ else
 	echoGreen "Found!"
 fi
 
-#echoStep "Detecting Cubian desktop image..."
-#if [ ! -f "$TARS/Cubian-desktop-x1-a10-hdmi.img" ] ; then
-#	echoRed "Not found, Downloading!"
-#	tar xvf $TARS/cubiescreen_drv.tar
-#else
-#	echoGreen "Found!"
-#fi
-
-
 
 #### PREPARING
 
 echoStep "Installing dependencies..."
-sudo apt-get install libusb-1.0 pkg-config p7zip-full -y
+sudo apt-get install libusb-1.0 pkg-config p7zip-full gcc-arm-linux-gnueabihf -y
 echoGreen "Done!"
 
 
@@ -96,98 +91,58 @@ cd sunxi-bsp
 cd ..
 echoGreen "Done!"
 
-#echoStep "Copying default cubieboard.fex..."
-#cp -vf cubiescreen/cubieboard.fex sunxi-bsp/sunxi-boards/sys_config/a10/
-#echoGreen "Done!"
-
-#echoStep "Copying sun7i_defconfig..."
-#cp -vf cubiescreen/sun7i_defconfig linux-sunxi/arch/arm/configs/
-#echoGreen "Done!"
-
 echoStep "Detecting Cubian Desktop image..."
-if [ ! -f "$TARS/Cubian-desktop-x1-a10-hdmi.img.7z" ] ; then
+if [ ! -f "$TARS/${CUBIAN_IMG}.7z" ] ; then
 	echoRed "Not found, downloading!"
 	cd $TARS
-	wget "http://creadoresdigitales.com/archivos/Cubian-desktop-x1-a10-hdmi.img.7z"
+	wget "http://creadoresdigitales.com/archivos/${CUBIAN_IMG}.7z"
 	cd ..
 else
 	echoGreen "Found!"
 fi
 
-echoStep "Detecting Cubian Desktop image..."
-if [ ! -f "$TARS/Cubian-desktop-x1-a10-hdmi.img" ] ; then
-	echoRed "Not found, extracting!"
+echoStep "Detecting Cubian extracted image..."
+if [ ! -f "$TARS/$CUBIAN_IMG" ] ; then
+	echoRed "Not found, Extracting!"
 	cd $TARS
-	7z x Cubian-desktop-x1-a10-hdmi.img.7z
+	7z x ${CUBIAN_IMG}.7z
 	cd ..
-else
-	echoGreen "Found!"
 fi
-	
-#if [ ! -f "$TARS/ubuntu_sdk.tar.gz" ] ; then
-#	### Gor for Linaro
-#	echoStep "Detecting Linaro SDK..."
-#	if [ ! -f "$TARS/linaro-quantal-alip-20130422-342.tar.gz" ] ; then
-#		echoRed "Not found, downloading!"
-#		cd $TARS
-#		wget "http://creadoresdigitales.com/archivos/linaro-quantal-alip-20130422-342.tar.gz"
-#		cd ..
-#	else
-#		echoGreen "Found!"
-#	fi
-#	
-#	
-#	echoStep "Detecting uncompressed Linaro SDK..."
-#	if [ ! -d "binary" ] ; then
-#		echoRed "Not found, extracting!"
-#		tar zxvf $TARS/linaro-quantal-alip-20130422-342.tar.gz
-#	else
-#		echoGreen "Found!"
-#	fi
-#	
-#	
-#	
-#	echoStep "Updating Linaro configuration..."
-#	cp -v cubiescreen/sdk_configure/sources.list binary/etc/apt/
-#	cp -v cubiescreen/sdk_configure/lightdm.conf binary/etc/lightdm/
-#	RESULT=$( egrep -c 'ft5x_ts' binary/etc/modules )
-#	echoStep "Adding ft5x_ts to modules file..."
-#	if [ $RESULT -eq 0 ] ; then
-#		echo "ft5x_ts" >> binary/etc/modules
-#		echoGreen "Added!"
-#	else
-#		echoRed "Skiping!"
-#	fi
-#	cp -v cubiescreen/sdk_configure/10-evdev.conf binary/usr/share/X11/xorg.conf.d/
-#	cp -v cubiescreen/sdk_configure/exynos.conf binary/usr/share/X11/xorg.conf.d/
-#	cp -v cubiescreen/sdk_configure/xinput_calibrator binary/usr/bin/
-#	cp -v cubiescreen/sdk_configure/xinput_calibrator.1.gz binary/usr/share/man/man1/
-#
-#	cp -v shadow binary/etc/shadow
-#	
-#	####Repacking
-#	echoStep "Repacking Linaro..."
-#	if [ -d "binary" ] ; then
-#		tar cfz $TARS/ubuntu_sdk.tar.gz binary
-#		echoGreen "Done!"
-#	else
-#		echoRed "Failed!"
-#	fi
-#else
-#	echoRed "Linaro already repacked!"
-#fi
-
 
 echoStep "Mounting image..."
 
-echoStep "Detecting Cubian desktop image..."
-if [ ! -f "$TARS/Cubian-desktop-x1-a10-hdmi.img" ] ; then
-	echoRed "Not found, Downloading!"
+echoStep "Detecting Cubian extracted image..."
+if [ ! -f "$TARS/$CUBIAN_IMG" ] ; then
+	echoRed "Not found, Extracting!"
+	exit -1
 else
 	echoGreen "Found!"
 	LOOP=$( sudo losetup -f )
 	echo "Loop device available: $LOOP"
-	sudo losetup $LOOP $TARS/Cubian-desktop-x1-a10-hdmi.img
+
+	
+	SIZE=$( ls -alF $TARS/$CUBIAN_IMG | egrep -o '\s[0-9]{8,}\s' )
+	HUMAN_SIZE_M=$(( SIZE / 1024 / 1024 ))
+	FINAL_HUMAN_SIZE_M=$(( HUMAN_SIZE_M + GROW_SIZE_M ))
+	
+	echoStep "Growing image from $HUMAN_SIZE_M to $FINAL_HUMAN_SIZE_M MB"
+
+	if [ $HUMAN_SIZE_M -lt $THRESHOLD_M ]; then
+		dd if=/dev/zero bs=1M count=$GROW_SIZE_M >> $TARS/$CUBIAN_IMG
+		sudo losetup $LOOP $TARS/$CUBIAN_IMG
+		sudo partprobe $LOOP
+		sudo sfdisk --force $LOOP < $NEW_CUBIAN_PART
+		sudo partprobe $LOOP
+		sudo e2fsck -f ${LOOP}p2 
+		sudo resize2fs ${LOOP}p2
+		sudo losetup -d $LOOP
+		echoGreen "Done!"
+	else
+		echoRed "Already growned!"
+	fi
+
+	LOOP=$( sudo losetup -f )
+	sudo losetup $LOOP $TARS/$CUBIAN_IMG
 	
 	echoStep "creating mount points..."
 	mkdir boot -p
@@ -221,25 +176,25 @@ else
 	echoGreen "Done!"
 
 	echoStep "Installing kernel..."
-	cp -v linux-sunxi/arch/arm/boot/uImage boot 
+	sudo cp -v linux-sunxi/arch/arm/boot/uImage boot 
 	echoGreen "Done!"
 	
 	echoStep "Installing modules..."
-	cp -vR linux-sunxi/output/lib/modules system/lib
+	sudo cp -vR linux-sunxi/output/lib/modules system/lib
 	echoGreen "Done!"
 
 	####load module
 	RESULT=$( egrep -c 'ft5x_ts' system/etc/modules )
 	echoStep "Adding ft5x_ts to modules file..."
 	if [ $RESULT -eq 0 ] ; then
-		echo "ft5x_ts" >> system/etc/modules
+		cp system/etc/modules .
+		sudo echo "ft5x_ts" >> modules
+		sudo cp -v modules system/etc/modules  
 		echoGreen "Added!"
 	else
 		echoRed "Skiping!"
 	fi
 
-
-	
 	echoStep "Unmounting directories..."
 	sudo umount boot
 	sudo umount system

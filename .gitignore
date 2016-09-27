@@ -1,10 +1,10 @@
 linux-sunxi
 rtl8192eu
 sunxi-bsp
-tars/linaro-quantal-alip-20130422-342.tar.gz
 tars/ubuntu_sdk.tar.gz
 cubiescreen
 binary
 *.img
+*.7z
 boot
 system
